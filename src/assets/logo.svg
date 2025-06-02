@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="100" viewBox="0 0 400 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Courthouse -->
+  <rect x="30" y="55" width="10" height="30" rx="2" fill="#223A5E"/>
+  <rect x="50" y="55" width="10" height="30" rx="2" fill="#223A5E"/>
+  <rect x="70" y="55" width="10" height="30" rx="2" fill="#223A5E"/>
+  <rect x="25" y="85" width="60" height="8" rx="2" fill="#223A5E"/>
+  <polygon points="25,55 55,30 85,55" fill="#223A5E"/>
+  <!-- Robot Face -->
+  <circle cx="100" cy="70" r="24" fill="#4F8EDC" stroke="#223A5E" stroke-width="4"/>
+  <rect x="86" y="56" width="28" height="28" rx="14" fill="#4F8EDC"/>
+  <circle cx="92" cy="72" r="3.5" fill="#223A5E"/>
+  <circle cx="108" cy="72" r="3.5" fill="#223A5E"/>
+  <rect x="95" y="80" width="10" height="3" rx="1.5" fill="#223A5E"/>
+  <rect x="98" y="42" width="4" height="10" rx="2" fill="#223A5E"/>
+  <circle cx="100" cy="42" r="4" fill="#4F8EDC" stroke="#223A5E" stroke-width="2"/>
+  <!-- Text -->
+  <text x="130" y="80" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="bold" fill="#223A5E">DepoIntel</text>
+</svg> 

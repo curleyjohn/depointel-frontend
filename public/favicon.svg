@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Rounded square background -->
+  <rect x="0" y="0" width="128" height="128" rx="28" fill="#F5F5F3"/>
+  <!-- Courthouse (scaled up) -->
+  <rect x="22" y="56" width="12" height="44" rx="2.5" fill="#223A5E"/>
+  <rect x="44" y="56" width="12" height="44" rx="2.5" fill="#223A5E"/>
+  <rect x="66" y="56" width="12" height="44" rx="2.5" fill="#223A5E"/>
+  <rect x="18" y="100" width="68" height="10" rx="2.5" fill="#223A5E"/>
+  <polygon points="18,56 52,22 86,56" fill="#223A5E"/>
+  <!-- Robot Face (scaled up and centered right) -->
+  <circle cx="98" cy="72" r="28" fill="#4F8EDC" stroke="#223A5E" stroke-width="5"/>
+  <rect x="80" y="54" width="36" height="36" rx="18" fill="#4F8EDC"/>
+  <circle cx="90" cy="72" r="4.5" fill="#223A5E"/>
+  <circle cx="106" cy="72" r="4.5" fill="#223A5E"/>
+  <rect x="94" y="86" width="12" height="4" rx="2" fill="#223A5E"/>
+  <rect x="96" y="34" width="6" height="14" rx="3" fill="#223A5E"/>
+  <circle cx="99" cy="34" r="5" fill="#4F8EDC" stroke="#223A5E" stroke-width="2"/>
+</svg> 
