@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getCaseById, Case } from '../services/api';
+import { getCaseById } from '../services/api';
 
 const CaseDetails: React.FC = () => {
   const { caseId } = useParams<{ caseId: string }>();
@@ -52,7 +52,7 @@ const CaseDetails: React.FC = () => {
   return (
     <div className="bg-white shadow rounded-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">{case_.title}</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">{case_.name}</h1>
         <button
           onClick={() => navigate('/cases')}
           className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
@@ -64,24 +64,25 @@ const CaseDetails: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div>
-            <h2 className="text-sm font-medium text-gray-500">Court</h2>
-            <p className="mt-1 text-sm text-gray-900">{case_.court}</p>
+            <h2 className="text-sm font-medium text-gray-500">Court Type</h2>
+            <p className="mt-1 text-sm text-gray-900">{case_.court_type}</p>
           </div>
           <div>
-            <h2 className="text-sm font-medium text-gray-500">Jurisdiction</h2>
-            <p className="mt-1 text-sm text-gray-900">{case_.jurisdiction}</p>
+            <h2 className="text-sm font-medium text-gray-500">State</h2>
+            <p className="mt-1 text-sm text-gray-900">{case_.state?.toUpperCase()}</p>
           </div>
           <div>
             <h2 className="text-sm font-medium text-gray-500">Case Type</h2>
-            <p className="mt-1 text-sm text-gray-900">{case_.caseType}</p>
+            <p className="mt-1 text-sm text-gray-900">{case_.type}</p>
           </div>
           <div>
             <h2 className="text-sm font-medium text-gray-500">Status</h2>
             <span className={`mt-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
               ${case_.status === 'active' ? 'bg-green-100 text-green-800' :
                 case_.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-gray-100 text-gray-800'}`}>
-              {case_.status}
+                  case_.status === 'closed' ? 'bg-gray-100 text-gray-800' :
+                    'bg-gray-200 text-gray-600'}`}>
+              {case_.status ? case_.status : 'Unknown'}
             </span>
           </div>
         </div>
@@ -92,12 +93,12 @@ const CaseDetails: React.FC = () => {
             <p className="mt-1 text-sm text-gray-900">{case_.judge}</p>
           </div>
           <div>
-            <h2 className="text-sm font-medium text-gray-500">Date Filed</h2>
-            <p className="mt-1 text-sm text-gray-900">{case_.date}</p>
+            <h2 className="text-sm font-medium text-gray-500">Filing Date</h2>
+            <p className="mt-1 text-sm text-gray-900">{case_.filing_date}</p>
           </div>
           <div>
             <h2 className="text-sm font-medium text-gray-500">Last Updated</h2>
-            <p className="mt-1 text-sm text-gray-900">{case_.lastUpdated}</p>
+            <p className="mt-1 text-sm text-gray-900">{case_.case_last_updated}</p>
           </div>
         </div>
       </div>
@@ -105,11 +106,7 @@ const CaseDetails: React.FC = () => {
       <div className="mt-8">
         <h2 className="text-lg font-medium text-gray-900 mb-4">Parties</h2>
         <div className="bg-gray-50 rounded-lg p-4">
-          <ul className="space-y-2">
-            {case_.parties.map((party: string, index: number) => (
-              <li key={index} className="text-sm text-gray-900">{party}</li>
-            ))}
-          </ul>
+          <div className="text-sm text-gray-900">{case_.parties}</div>
         </div>
       </div>
     </div>

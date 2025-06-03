@@ -1,14 +1,17 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getCases } from '../services/api';
+import { getCases, Case } from '../services/api';
 
 const Dashboard: React.FC = () => {
-  const { data: cases, isLoading, error } = useQuery({
+  const { data: cases, isLoading, error } = useQuery<Case[]>({
     queryKey: ['cases'],
-    queryFn: getCases
+    queryFn: () => getCases(),
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    gcTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
-  console.log('data:', cases);
+  const activeCases = cases?.filter((c: Case) => c.status?.toLowerCase() === 'active') || [];
+  const pendingCases = cases?.filter((c: Case) => c.status?.toLowerCase() === 'pending') || [];
 
   return (
     <div className="bg-white shadow rounded-lg p-6">
@@ -25,14 +28,14 @@ const Dashboard: React.FC = () => {
         <div className="bg-green-50 rounded-lg p-6">
           <h2 className="text-lg font-medium text-green-900">Active Cases</h2>
           <p className="text-3xl font-bold text-green-600 mt-2">
-            {isLoading ? '...' : cases?.filter(c => c.status.toLowerCase() === 'active').length || 0}
+            {isLoading ? '...' : activeCases.length}
           </p>
         </div>
 
         <div className="bg-yellow-50 rounded-lg p-6">
           <h2 className="text-lg font-medium text-yellow-900">Pending Cases</h2>
           <p className="text-3xl font-bold text-yellow-600 mt-2">
-            {isLoading ? '...' : cases?.filter(c => c.status.toLowerCase() === 'pending').length || 0}
+            {isLoading ? '...' : pendingCases.length}
           </p>
         </div>
       </div>
