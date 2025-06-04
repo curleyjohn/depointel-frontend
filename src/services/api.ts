@@ -39,6 +39,8 @@ export interface CaseFilters {
   query?: {
     jurisdiction?: string[];
     date_filed?: string;
+    date_filed_from?: string;
+    date_filed_to?: string;
     status?: string;
     case_type?: string;
     judge?: string;

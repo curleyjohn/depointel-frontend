@@ -83,6 +83,12 @@ const CaseDetails: React.FC = () => {
 
   return (
     <div className="bg-white shadow rounded-lg p-6">
+      <button
+        onClick={() => navigate('/cases')}
+        className="mb-6 px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition"
+      >
+        ← Back to Cases List
+      </button>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">{case_.name}</h1>
         <button
