@@ -101,4 +101,24 @@ export const getCaseById = async (id: string): Promise<Case> => {
   }
 };
 
+export const getJudgeDetails = async (caseId: string): Promise<{ name: string }> => {
+  try {
+    const response = await api.get(`/tokens/judge/${caseId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching judge details for case ${caseId}:`, error);
+    throw error;
+  }
+};
+
+export const getPartiesDetails = async (caseId: string): Promise<{ parties: Array<{ name: string; role?: string }> }> => {
+  try {
+    const response = await api.get(`/tokens/parties/${caseId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching parties details for case ${caseId}:`, error);
+    throw error;
+  }
+};
+
 export default api; 
