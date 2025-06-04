@@ -1,15 +1,8 @@
 import React from 'react';
 
 interface FilterBarProps {
-  onFilterChange: (filters: {
-    status: string;
-    jurisdiction: string;
-    date_filed: string;
-    case_type: string;
-    judge: string;
-    court: string;
-  }) => void;
-  jurisdiction: string;
+  onFilterChange: (filters: Partial<any['query']>) => void;
+  jurisdiction: string[];
   onJurisdictionChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
@@ -17,7 +10,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterChange, jurisdiction, onJ
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onFilterChange({
       status: e.target.value,
-      jurisdiction: '',
+      jurisdiction: [],
       date_filed: '',
       case_type: '',
       judge: '',
@@ -40,12 +33,11 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterChange, jurisdiction, onJ
       </div>
       <div className="w-full sm:w-48">
         <select
-          id="jurisdiction"
-          value={jurisdiction || ''}
+          value={jurisdiction.length === 1 ? jurisdiction[0] : 'all'}
           onChange={onJurisdictionChange}
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
-          <option value="">All Jurisdictions</option>
+          <option value="all">All Jurisdictions</option>
           <option value="oh">Ohio</option>
           <option value="in">Indiana</option>
           <option value="il">Illinois</option>

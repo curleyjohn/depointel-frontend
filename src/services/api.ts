@@ -2,29 +2,42 @@ import axios from 'axios';
 
 export interface Case {
   case: string;
-  case_last_updated: string;
-  case_outcome_type: string;
-  case_token: string;
-  category: string;
-  county: string;
-  court_type: string;
-  events: string;
-  filing_date: string;
-  is_federal: boolean;
-  judge: string;
-  last_refreshed: string;
-  matter_type: string;
+  case_token?: string;
   name: string;
-  parties: string;
-  practice_area: string;
-  state: string;
-  status: string;
-  type: string;
+  court_type?: string;
+  court_code?: string;
+  county?: string;
+  state?: string;
+  filing_courthouse?: string;
+  court?: string;
+  type?: string;
+  category?: string;
+  practice_area?: string;
+  matter_type?: string;
+  case_outcome_type?: string;
+  status?: string;
+  verdict?: string;
+  time_to_first_cmc?: string;
+  time_to_first_dismissal?: string;
+  case_cycle_time?: string;
+  filing_date?: string;
+  case_last_updated?: string;
+  last_refreshed?: string;
+  parties?: string;
+  alert?: string;
+  refresh?: string;
+  events?: string;
+  attorneys?: string;
+  documents?: string;
+  judge?: string;
+  raw_causes_of_action?: string;
+  is_federal?: boolean;
+  complaint_overview?: string;
 }
 
 export interface CaseFilters {
   query?: {
-    jurisdiction?: string;
+    jurisdiction?: string[];
     date_filed?: string;
     status?: string;
     case_type?: string;

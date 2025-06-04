@@ -1,14 +1,25 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
 import { getCases, Case } from '../services/api';
 
 const Dashboard: React.FC = () => {
-  const { data: cases, isLoading, error } = useQuery<Case[]>({
-    queryKey: ['cases'],
-    queryFn: () => getCases(),
-    staleTime: 30000, // Consider data fresh for 30 seconds
-    gcTime: 5 * 60 * 1000, // Cache for 5 minutes
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [cases, setCases] = useState<Case[]>([]);
+
+  const handleFetchCases = () => {
+    setIsLoading(true);
+    getCases()
+      .then(data => {
+        setCases(data);
+        setError(null);
+      })
+      .catch(err => {
+        setError(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   const activeCases = cases?.filter((c: Case) => c.status?.toLowerCase() === 'active') || [];
   const pendingCases = cases?.filter((c: Case) => c.status?.toLowerCase() === 'pending') || [];
@@ -16,7 +27,12 @@ const Dashboard: React.FC = () => {
   return (
     <div className="bg-white shadow rounded-lg p-6">
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">Dashboard</h1>
-
+      <button
+        onClick={handleFetchCases}
+        className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+      >
+        Fetch Cases
+      </button>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-indigo-50 rounded-lg p-6">
           <h2 className="text-lg font-medium text-indigo-900">Total Cases</h2>

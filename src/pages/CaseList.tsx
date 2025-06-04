@@ -1,15 +1,14 @@
 import React, { useState, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { getCases, Case, CaseFilters } from '../services/api';
 import FilterBar from '../components/FilterBar';
 
 const CaseList: React.FC = () => {
-  const [jurisdiction, setJurisdiction] = useState('');
+  const [jurisdiction, setJurisdiction] = useState<string[]>([]);
   const [filters, setFilters] = useState<CaseFilters>({
     query: {
       status: '',
-      jurisdiction: '',
+      jurisdiction: [],
       date_filed: '',
       case_type: '',
       judge: '',
@@ -21,22 +20,22 @@ const CaseList: React.FC = () => {
     sort_order: 'desc'
   });
 
-  const { data: cases, isLoading, error } = useQuery<Case[]>({
-    queryKey: ['cases', filters],
-    queryFn: () => getCases(filters),
-    // staleTime: 30000, // Consider data fresh for 30 seconds
-    gcTime: 5 * 60 * 1000, // Cache for 5 minutes
-  });
-
-  console.log(cases);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [cases, setCases] = useState<Case[]>([]);
 
   const handleJurisdictionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setJurisdiction(e.target.value);
+    const selectedJurisdiction = e.target.value;
+    if (selectedJurisdiction === 'all') {
+      setJurisdiction(['oh', 'in', 'il', 'ia', 'mi', 'mo', 'ks', 'mn', 'wi']);
+    } else {
+      setJurisdiction([selectedJurisdiction]);
+    }
     setFilters((prev: any) => ({
       ...prev,
       query: {
         ...prev.query,
-        jurisdiction: e.target.value
+        jurisdiction: selectedJurisdiction === 'all' ? ['oh', 'in', 'il', 'ia', 'mi', 'mo', 'ks', 'mn', 'wi'] : [selectedJurisdiction]
       }
     }));
   };
@@ -50,6 +49,21 @@ const CaseList: React.FC = () => {
       }
     }));
   }, []);
+
+  const handleFetchCases = () => {
+    setIsLoading(true);
+    getCases(filters)
+      .then(data => {
+        setCases(data);
+        setError(null);
+      })
+      .catch(err => {
+        setError(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   const getStatusColor = (status?: string) => {
     if (!status) return 'bg-gray-200 text-gray-600';
@@ -76,6 +90,13 @@ const CaseList: React.FC = () => {
         jurisdiction={jurisdiction}
         onJurisdictionChange={handleJurisdictionChange}
       />
+
+      <button
+        onClick={handleFetchCases}
+        className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+      >
+        Fetch Cases
+      </button>
 
       {isLoading && (
         <div className="text-center py-4">
@@ -131,7 +152,7 @@ const CaseList: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{case_.filing_date}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{case_.judge}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{case_.county}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{case_.state.toUpperCase()}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{case_.state?.toUpperCase()}</td>
                   </tr>
                 ))}
               </tbody>
