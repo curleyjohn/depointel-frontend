@@ -14,10 +14,14 @@ const CaseDetails: React.FC = () => {
   const [partiesDetails, setPartiesDetails] = useState<any>(null);
   const [loadingJudge, setLoadingJudge] = useState(false);
   const [loadingParties, setLoadingParties] = useState(false);
+  const [judgeError, setJudgeError] = useState<string | null>(null);
+  const [partiesError, setPartiesError] = useState<string | null>(null);
+  const [mainError, setMainError] = useState<string | null>(null);
 
   const handleFetchCaseDetails = useCallback(() => {
     if (!caseId) return;
     setIsLoading(true);
+    setMainError(null);
     getCaseById(caseId)
       .then(data => {
         setCase(data);
@@ -25,9 +29,15 @@ const CaseDetails: React.FC = () => {
         setRevealedFields({});
         setJudgeDetails(null);
         setPartiesDetails(null);
+        setJudgeError(null);
+        setPartiesError(null);
       })
       .catch(err => {
-        setError(err);
+        if (err.response?.status === 429 || err.response?.data?.is_ratelimited) {
+          setMainError('Too many requests in a day. Please try again tomorrow.');
+        } else {
+          setError(err);
+        }
         setCase(null);
       })
       .finally(() => {
@@ -44,10 +54,18 @@ const CaseDetails: React.FC = () => {
   const handleRevealJudge = async () => {
     if (!case_ || !case_.judge) return;
     setLoadingJudge(true);
+    setJudgeError(null);
     try {
       const data = await getJudgeDetails(case_.judge);
       setJudgeDetails(data);
       setRevealedFields(rf => ({ ...rf, judge: true }));
+    } catch (err: any) {
+      if (err.response?.status === 429 || err.response?.data?.is_ratelimited) {
+        setJudgeError('Too many requests in a day. Please try again tomorrow.');
+        setRevealedFields(rf => ({ ...rf, judge: true }));
+      } else {
+        setJudgeError('Failed to fetch judge details.');
+      }
     } finally {
       setLoadingJudge(false);
     }
@@ -56,14 +74,32 @@ const CaseDetails: React.FC = () => {
   const handleRevealParties = async () => {
     if (!case_ || !case_.parties) return;
     setLoadingParties(true);
+    setPartiesError(null);
     try {
       const data = await getPartiesDetails(case_.parties);
       setPartiesDetails(data);
       setRevealedFields(rf => ({ ...rf, parties: true }));
+    } catch (err: any) {
+      if (err.response?.status === 429 || err.response?.data?.is_ratelimited) {
+        setPartiesError('Too many requests in a day. Please try again tomorrow.');
+        setRevealedFields(rf => ({ ...rf, parties: true }));
+      } else {
+        setPartiesError('Failed to fetch parties details.');
+      }
     } finally {
       setLoadingParties(false);
     }
   };
+
+  if (mainError) {
+    return (
+      <div className="bg-white shadow rounded-lg p-6">
+        <div className="text-center py-4">
+          <span className="text-red-500 font-semibold">{mainError}</span>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -185,7 +221,9 @@ const CaseDetails: React.FC = () => {
           <div>
             <h3 className="text-sm font-medium text-gray-500">Judge</h3>
             <div className="mt-1 text-sm text-gray-900 break-all flex flex-col gap-2">
-              {revealedFields.judge ? (
+              {judgeError ? (
+                <span className="text-red-500">{judgeError}</span>
+              ) : revealedFields.judge ? (
                 judgeDetails ? (
                   <>
                     {judgeDetails.fullname && <div><span className="font-semibold">Name:</span> {judgeDetails.fullname}</div>}
@@ -281,7 +319,9 @@ const CaseDetails: React.FC = () => {
           <div>
             <h3 className="text-sm font-medium text-gray-500">Parties</h3>
             <div className="mt-1 text-sm text-gray-900 break-all flex flex-col gap-2">
-              {revealedFields.parties ? (
+              {partiesError ? (
+                <span className="text-red-500">{partiesError}</span>
+              ) : revealedFields.parties ? (
                 partiesDetails ? (
                   <>
                     {/* Plaintiffs */}

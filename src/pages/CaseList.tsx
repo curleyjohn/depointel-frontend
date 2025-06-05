@@ -88,6 +88,92 @@ const CaseList: React.FC = () => {
       });
   };
 
+  const handleExportCSV = () => {
+    if (!cases.length) return;
+
+    // Define CSV headers
+    const headers = [
+      'Case Name',
+      'Case Number',
+      'Court Type',
+      'Court Code',
+      'Court',
+      'Filing Courthouse',
+      'County',
+      'State',
+      'Type',
+      'Category',
+      'Practice Area',
+      'Matter Type',
+      'Case Outcome',
+      'Verdict',
+      'Time to First CMC',
+      'Time to First Dismissal',
+      'Case Cycle Time',
+      'Filing Date',
+      'Last Updated',
+      'Last Refreshed',
+      'Federal Case',
+      'Causes of Action',
+      'Complaint Overview'
+    ];
+
+    // Convert cases to CSV rows
+    const csvRows = cases.map(case_ => [
+      case_.name || '',
+      case_.case || '',
+      case_.court_type || '',
+      case_.court_code || '',
+      case_.court || '',
+      case_.filing_courthouse || '',
+      case_.county || '',
+      case_.state?.toUpperCase() || '',
+      case_.type || '',
+      case_.category || '',
+      case_.practice_area || '',
+      case_.matter_type || '',
+      case_.case_outcome_type || '',
+      case_.verdict || '',
+      case_.time_to_first_cmc || '',
+      case_.time_to_first_dismissal || '',
+      case_.case_cycle_time || '',
+      case_.filing_date || '',
+      case_.case_last_updated || '',
+      case_.last_refreshed || '',
+      case_.is_federal ? 'Yes' : 'No',
+      case_.raw_causes_of_action || '',
+      case_.complaint_overview || ''
+    ]);
+
+    // Combine headers and rows
+    const csvContent = [
+      headers.join(','),
+      ...csvRows.map(row => row.map(cell => {
+        // Escape special characters and wrap in quotes if needed
+        const cellStr = String(cell).replace(/"/g, '""');
+        return cellStr.includes(',') ? `"${cellStr}"` : cellStr;
+      }).join(','))
+    ].join('\n');
+
+    // Format the filename
+    const stateStr = jurisdiction.length === 1 ? jurisdiction[0].toUpperCase() : 'ALL';
+    const dateFromStr = dateFrom.replace(/-/g, '');
+    const dateToStr = dateTo.replace(/-/g, '');
+    const currentDate = new Date().toISOString().split('T')[0].replace(/-/g, '');
+    const filename = `cases_${stateStr}_${dateFromStr}_${dateToStr}_${currentDate}.csv`;
+
+    // Create and download the file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // Helper to truncate and tooltip
   const renderCell = (value: any) => {
     if (typeof value === 'string' && value.length > 30) {
@@ -157,6 +243,13 @@ const CaseList: React.FC = () => {
                 </svg>
               ) : null}
               {isLoading ? 'Loading...' : 'Fetch Cases'}
+            </button>
+            <button
+              onClick={handleExportCSV}
+              className="h-10 px-6 py-2 bg-green-600 text-white font-semibold rounded-md shadow hover:bg-green-700 transition flex items-center justify-center"
+              disabled={!cases.length}
+            >
+              Export CSV
             </button>
           </div>
         </div>
