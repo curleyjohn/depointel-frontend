@@ -26,6 +26,7 @@ const CaseList: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [cases, setCases] = useState<Case[]>([]);
+  const [selectedCases, setSelectedCases] = useState<Set<string>>(new Set());
 
   const handleJurisdictionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedJurisdiction = e.target.value;
@@ -88,8 +89,31 @@ const CaseList: React.FC = () => {
       });
   };
 
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      const allCaseTokens = cases.map(c => c.case_token || '');
+      setSelectedCases(new Set(allCaseTokens));
+    } else {
+      setSelectedCases(new Set());
+    }
+  };
+
+  const handleSelectCase = (caseToken: string | undefined) => {
+    if (!caseToken) return;
+
+    setSelectedCases(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(caseToken)) {
+        newSet.delete(caseToken);
+      } else {
+        newSet.add(caseToken);
+      }
+      return newSet;
+    });
+  };
+
   const handleExportCSV = () => {
-    if (!cases.length) return;
+    if (!cases.length || selectedCases.size === 0) return;
 
     // Define CSV headers
     const headers = [
@@ -118,32 +142,34 @@ const CaseList: React.FC = () => {
       'Complaint Overview'
     ];
 
-    // Convert cases to CSV rows
-    const csvRows = cases.map(case_ => [
-      case_.name || '',
-      case_.case || '',
-      case_.court_type || '',
-      case_.court_code || '',
-      case_.court || '',
-      case_.filing_courthouse || '',
-      case_.county || '',
-      case_.state?.toUpperCase() || '',
-      case_.type || '',
-      case_.category || '',
-      case_.practice_area || '',
-      case_.matter_type || '',
-      case_.case_outcome_type || '',
-      case_.verdict || '',
-      case_.time_to_first_cmc || '',
-      case_.time_to_first_dismissal || '',
-      case_.case_cycle_time || '',
-      case_.filing_date || '',
-      case_.case_last_updated || '',
-      case_.last_refreshed || '',
-      case_.is_federal ? 'Yes' : 'No',
-      case_.raw_causes_of_action || '',
-      case_.complaint_overview || ''
-    ]);
+    // Convert selected cases to CSV rows
+    const csvRows = cases
+      .filter(case_ => case_.case_token && selectedCases.has(case_.case_token))
+      .map(case_ => [
+        case_.name || '',
+        case_.case || '',
+        case_.court_type || '',
+        case_.court_code || '',
+        case_.court || '',
+        case_.filing_courthouse || '',
+        case_.county || '',
+        case_.state?.toUpperCase() || '',
+        case_.type || '',
+        case_.category || '',
+        case_.practice_area || '',
+        case_.matter_type || '',
+        case_.case_outcome_type || '',
+        case_.verdict || '',
+        case_.time_to_first_cmc || '',
+        case_.time_to_first_dismissal || '',
+        case_.case_cycle_time || '',
+        case_.filing_date || '',
+        case_.case_last_updated || '',
+        case_.last_refreshed || '',
+        case_.is_federal ? 'Yes' : 'No',
+        case_.raw_causes_of_action || '',
+        case_.complaint_overview || ''
+      ]);
 
     // Combine headers and rows
     const csvContent = [
@@ -246,8 +272,8 @@ const CaseList: React.FC = () => {
             </button>
             <button
               onClick={handleExportCSV}
-              className="h-10 px-6 py-2 bg-green-600 text-white font-semibold rounded-md shadow hover:bg-green-700 transition flex items-center justify-center"
-              disabled={!cases.length}
+              className="h-10 px-6 py-2 bg-green-600 text-white font-semibold rounded-md shadow hover:bg-green-700 transition flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!cases.length || selectedCases.size === 0}
             >
               Export CSV
             </button>
@@ -273,6 +299,14 @@ const CaseList: React.FC = () => {
               <table className="min-w-full divide-y divide-gray-200 text-sm">
                 <thead className="bg-gray-50 sticky top-0 z-10">
                   <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        checked={selectedCases.size === cases.length && cases.length > 0}
+                        onChange={handleSelectAll}
+                      />
+                    </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Case Name</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Case Number</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Court Type</th>
@@ -308,6 +342,14 @@ const CaseList: React.FC = () => {
                 <tbody className="bg-white divide-y divide-gray-100">
                   {cases.map((case_: Case, idx: number) => (
                     <tr key={case_.case_token} className={idx % 2 === 0 ? 'bg-white hover:bg-indigo-50' : 'bg-gray-50 hover:bg-indigo-50'}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                          checked={case_.case_token ? selectedCases.has(case_.case_token) : false}
+                          onChange={() => handleSelectCase(case_.case_token)}
+                        />
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap max-w-xs">
                         <Link to={`/cases/${case_.case_token}`} className="text-indigo-600 hover:text-indigo-900" title={case_.name}>
                           {renderCell(case_.name)}
