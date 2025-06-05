@@ -63,7 +63,10 @@ const api = axios.create({
 
 export const getCases = async (filters?: CaseFilters): Promise<Case[]> => {
   try {
-    const response = await api.post<Case[]>('/cases', filters);
+    const response = await api.post<Case[]>('/cases', {
+      ...filters,
+      syncWithSheets: true
+    });
     return response.data.map((item: any) => ({
       case: item.case,
       case_last_updated: item.case_last_updated,
